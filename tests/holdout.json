@@ -1,0 +1,22 @@
+[
+  {"label":"scam","text":"DMV Notice: Your driver's license will be suspended on Nov 20 due to unpaid traffic fines. Pay now to avoid penalties: https://ohio-dmv-services.icu/pay"},
+  {"label":"scam","text":"Venmo: You received a payment of $750 but it is pending. To accept the funds, verify your account here: venrno-payments.com/accept"},
+  {"label":"scam","text":"PayPal Invoice: You have been charged $699.00 for a Bitcoin purchase. If you did not make this purchase, contact PayPal support at +1 (808) 555-0163."},
+  {"label":"scam","text":"Final warning from the Sheriff's Office. You failed to appear in court. Pay the fine today using a Bitcoin ATM or a deputy will be sent to arrest you."},
+  {"label":"scam","text":"Hi Grandpa, it's me, please don't tell Mom. I got arrested and need $2,000 for bail right away. My lawyer will call you, please do what he says."},
+  {"label":"scam","text":"Congratulations, you have been selected for a free iPhone 17! Claim your reward before it expires today. Small shipping fee applies. tap here: rb.gy/x8k2p"},
+  {"label":"scam","text":"Your Spectrum internet will be disconnected today due to a missed payment. To avoid disconnection, pay immediately with a gift card by calling 1-877-555-0136."},
+  {"label":"scam","text":"Hello dear, I am a doctor working with the UN in Syria. I want to share my life with you. I have gold bars I need help shipping, I will send a courier to you."},
+  {"label":"scam","text":"Alert: Your Amazon Prime membership is about to be renewed for $139. To cancel and receive a refund, call 1-866-555-0123 immediately."},
+  {"label":"scam","text":"Your iCloud storage is full and your photos will be deleted. Update your payment method within 24 hours: icloud-storage-renew.com"},
+  {"label":"scam","text":"I'm a recruiter from Coinbase. We have a part-time remote position, earn $300 a day completing simple tasks. Message me on WhatsApp to apply."},
+  {"label":"scam","text":"Bank of America: We've temporarily locked your debit card due to suspicious activity. Reply with your card number and PIN to unlock it."},
+  {"label":"legit","text":"Your Venmo verification code is 284019. Never share this code. Venmo will never call or text you for it."},
+  {"label":"legit","text":"Hi Mom, practice ran late, can you pick me up at 6:30 instead of 6?"},
+  {"label":"legit","text":"FedEx: Your package from Best Buy is out for delivery today. Estimated delivery 2pm-6pm."},
+  {"label":"legit","text":"Netflix: A new device signed in to your account. If this was you, you can ignore this message."},
+  {"label":"legit","text":"Kroger: Your pickup order is ready! Park in a numbered spot and tap 'I'm here' in the app."},
+  {"label":"legit","text":"Reminder from Dayton Dental: cleaning appointment Monday at 2:00 PM. Please arrive 10 minutes early."},
+  {"label":"legit","text":"Hey, the study group is meeting in the library at 4 tomorrow. Bring your notes from chapter 6!"},
+  {"label":"legit","text":"Ohio BMV: Your registration renewal was processed. Your new sticker will arrive by mail in 7 to 10 days."}
+]

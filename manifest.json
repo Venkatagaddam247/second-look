@@ -1,0 +1,10 @@
+{
+  "name": "Second Look",
+  "short_name": "Second Look",
+  "description": "Check if a text, email, or link is a scam. Private and works offline.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f6f9",
+  "theme_color": "#14213d",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Second Look</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Paste a text, email, or link and get a plain-language answer: is this a scam? Runs entirely on your device.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#14213d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: one calm reading column, like a letter on a desk; findings are marked with a highlighter. */
+:root {
+  --paper: #f5f6f9;
+  --sheet: #ffffff;
+  --ink: #14213d;
+  --ink-soft: #4a5672;
+  --rule: #d9dde8;
+  --accent: #2b4fd8;
+  --accent-ink: #ffffff;
+  --marker: #ffe45c;
+  --marker-hot: #ffb3a7;
+  --danger: #b3261e;
+  --danger-bg: #fdecea;
+  --caution: #8a5a00;
+  --caution-bg: #fff4d6;
+  --safe: #1e6b34;
+  --safe-bg: #e6f4ea;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+  --base: 18px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e1424; --sheet: #161e33; --ink: #e9edf7; --ink-soft: #aab3cb; --rule: #2a3551;
+    --accent: #8aa6ff; --accent-ink: #0e1424; --marker: #6b5a00; --marker-hot: #7a2a22;
+    --danger: #ff8a80; --danger-bg: #3a1714; --caution: #ffcc66; --caution-bg: #3a2c0a;
+    --safe: #7fd796; --safe-bg: #13321d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e1424; --sheet: #161e33; --ink: #e9edf7; --ink-soft: #aab3cb; --rule: #2a3551;
+  --accent: #8aa6ff; --accent-ink: #0e1424; --marker: #6b5a00; --marker-hot: #7a2a22;
+  --danger: #ff8a80; --danger-bg: #3a1714; --caution: #ffcc66; --caution-bg: #3a2c0a;
+  --safe: #7fd796; --safe-bg: #13321d; color-scheme: dark;
+}
+:root.big { --base: 22px; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { font-size: var(--base); }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--body); font-size: 1rem; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* Header */
+header.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding-top: 1.25rem; }
+.brand { display: flex; align-items: center; gap: .6rem; }
+.brand svg { width: 2.2rem; height: 2.2rem; flex: none; }
+.brand h1 { font-size: 1.6rem; font-weight: 800; letter-spacing: -.01em; }
+.brand p { margin: 0; font-size: .8rem; color: var(--ink-soft); }
+.tools { display: flex; gap: .5rem; flex-wrap: wrap; }
+.chip-btn {
+  border: 1.5px solid var(--rule); background: var(--sheet); border-radius: 999px;
+  padding: .35rem .8rem; font-size: .8rem; cursor: pointer; min-height: 44px;
+}
+.chip-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+
+.privacy { display: flex; gap: .5rem; align-items: center; font-size: .8rem; color: var(--safe); }
+.privacy svg { width: 1.1rem; height: 1.1rem; flex: none; }
+
+/* Tabs */
+.tabs { display: flex; gap: .25rem; border-bottom: 2px solid var(--rule); }
+.tab {
+  background: none; border: none; padding: .6rem 1rem; cursor: pointer; font-weight: 700;
+  color: var(--ink-soft); border-bottom: 3px solid transparent; margin-bottom: -2px; min-height: 48px;
+}
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+/* Input */
+.sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 1.1rem; display: flex; flex-direction: column; gap: .8rem; }
+label.lead { font-family: var(--display); font-weight: 600; font-size: 1.15rem; }
+textarea {
+  width: 100%; min-height: 9rem; resize: vertical; padding: .8rem; border-radius: 10px;
+  border: 1.5px solid var(--rule); background: var(--paper); line-height: 1.5;
+}
+.row { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+.examples { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; font-size: .8rem; color: var(--ink-soft); }
+.examples button { border: 1px dashed var(--rule); background: transparent; border-radius: 8px; padding: .3rem .6rem; cursor: pointer; font-size: .8rem; min-height: 40px; }
+.primary {
+  background: var(--accent); color: var(--accent-ink); border: none; border-radius: 10px;
+  padding: .75rem 1.4rem; font-weight: 700; cursor: pointer; min-height: 52px; font-size: 1.05rem;
+}
+.secondary { background: var(--sheet); border: 1.5px solid var(--rule); border-radius: 10px; padding: .6rem 1rem; cursor: pointer; font-weight: 700; min-height: 48px; }
+.example-note { font-size: .78rem; color: var(--ink-soft); font-style: italic; }
+
+/* Verdict */
+.verdict { border-radius: 14px; padding: 1.1rem 1.2rem; display: grid; grid-template-columns: auto 1fr; gap: .4rem 1rem; align-items: center; border: 2px solid transparent; }
+.verdict.high { background: var(--danger-bg); border-color: var(--danger); }
+.verdict.medium { background: var(--caution-bg); border-color: var(--caution); }
+.verdict.low { background: var(--safe-bg); border-color: var(--safe); }
+.verdict .icon { grid-row: span 2; width: 3.2rem; height: 3.2rem; }
+.verdict.high .icon { color: var(--danger); } .verdict.medium .icon { color: var(--caution); } .verdict.low .icon { color: var(--safe); }
+.verdict h2 { font-size: 1.5rem; }
+.verdict .sub { margin: 0; color: var(--ink); }
+.meter { grid-column: 1 / -1; display: flex; flex-direction: column; gap: .25rem; margin-top: .4rem; }
+.meter .bar { height: .7rem; border-radius: 999px; background: linear-gradient(90deg, var(--safe) 0 30%, var(--caution) 30% 60%, var(--danger) 60% 100%); position: relative; opacity: .9; }
+.meter .pin { position: absolute; top: 50%; width: 1.2rem; height: 1.2rem; border-radius: 50%; background: var(--sheet); border: 3px solid var(--ink); transform: translate(-50%, -50%); transition: left .5s ease; }
+.meter .scale { display: flex; justify-content: space-between; font-size: .72rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+/* Marked-up message */
+.marked { white-space: pre-wrap; word-wrap: break-word; background: var(--paper); border-radius: 10px; padding: .9rem; border: 1px solid var(--rule); line-height: 1.7; }
+mark { background: var(--marker); color: inherit; padding: .05em .15em; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+mark.high { background: var(--marker-hot); }
+.legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .75rem; color: var(--ink-soft); }
+.legend span::before { content: ""; display: inline-block; width: .9em; height: .9em; border-radius: 3px; margin-right: .35em; vertical-align: -.1em; background: var(--marker); }
+.legend span.h::before { background: var(--marker-hot); }
+
+h3.sec { font-size: 1.1rem; }
+ol.reasons { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .6rem; }
+ol.reasons li { display: grid; grid-template-columns: 1.6rem 1fr; gap: .1rem .6rem; padding: .7rem .8rem; border-radius: 10px; border: 1px solid var(--rule); background: var(--sheet); }
+ol.reasons li .dot { width: 1.1rem; height: 1.1rem; border-radius: 50%; margin-top: .25rem; background: var(--caution); grid-row: span 2; }
+ol.reasons li.strong .dot { background: var(--danger); }
+ol.reasons li.safe .dot { background: var(--safe); }
+ol.reasons strong { display: block; }
+ol.reasons p { margin: 0; color: var(--ink-soft); font-size: .92rem; }
+
+.links { display: flex; flex-direction: column; gap: .6rem; }
+.link-card { border: 1px solid var(--rule); border-radius: 10px; padding: .7rem .8rem; display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
+.link-card .url { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .85rem; overflow-wrap: anywhere; }
+.pill { align-self: flex-start; display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: .15rem .55rem; border-radius: 999px; }
+.pill.danger { background: var(--danger-bg); color: var(--danger); }
+.pill.caution { background: var(--caution-bg); color: var(--caution); }
+.pill.ok { background: var(--safe-bg); color: var(--safe); }
+.realsite { font-size: .9rem; }
+.realsite b { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+.phones { display: flex; flex-wrap: wrap; gap: .4rem; }
+.phones span { font-variant-numeric: tabular-nums; text-decoration: line-through; text-decoration-color: var(--danger); text-decoration-thickness: 2px; background: var(--danger-bg); padding: .2rem .5rem; border-radius: 6px; }
+
+ol.steps { margin: 0; padding-left: 1.4rem; display: flex; flex-direction: column; gap: .45rem; }
+details { border: 1px solid var(--rule); border-radius: 10px; padding: .7rem .9rem; background: var(--sheet); }
+details summary { cursor: pointer; font-weight: 700; min-height: 32px; }
+details ul { margin: .6rem 0 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: .4rem; }
+
+/* Trusted person */
+.trusted { border: 2px solid var(--accent); }
+.trusted input { width: 100%; padding: .6rem .7rem; border-radius: 8px; border: 1.5px solid var(--rule); background: var(--paper); min-height: 48px; }
+.trusted .field { display: flex; flex-direction: column; gap: .25rem; flex: 1 1 14rem; min-width: 0; }
+.trusted .field label { font-size: .85rem; font-weight: 700; }
+.draft { white-space: pre-wrap; background: var(--paper); border-radius: 10px; padding: .8rem; border: 1px dashed var(--rule); font-size: .9rem; max-height: 14rem; overflow: auto; }
+.toast { font-size: .85rem; color: var(--safe); font-weight: 700; min-height: 1.3em; }
+
+/* Practice */
+.practice-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+.tally { font-variant-numeric: tabular-nums; color: var(--ink-soft); font-size: .9rem; }
+.phone-msg { align-self: flex-start; max-width: 34rem; background: var(--paper); border: 1px solid var(--rule); border-radius: 18px 18px 18px 4px; padding: .8rem 1rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.from { font-size: .78rem; color: var(--ink-soft); }
+.answer { border-radius: 10px; padding: .8rem 1rem; font-weight: 700; }
+.answer.right { background: var(--safe-bg); color: var(--safe); }
+.answer.wrong { background: var(--danger-bg); color: var(--danger); }
+
+footer { font-size: .78rem; color: var(--ink-soft); display: flex; flex-direction: column; gap: .3rem; border-top: 1px solid var(--rule); padding-top: 1rem; }
+
+@media (max-width: 480px) {
+  .verdict { grid-template-columns: 1fr; }
+  .verdict .icon { grid-row: auto; }
+  .primary { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="17" cy="17" r="11" fill="none" stroke="currentColor" stroke-width="4"/><path d="M25 25l9 9" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M11 17h12" stroke="var(--marker)" stroke-width="5" stroke-linecap="round"/></svg>
+      <div>
+        <h1>Second Look</h1>
+        <p>Is this message a scam? Check before you click, call, or pay.</p>
+      </div>
+    </div>
+    <div class="tools">
+      <button class="chip-btn" id="bigText" aria-pressed="false">Larger text</button>
+      <button class="chip-btn" id="readAloud">Read result aloud</button>
+    </div>
+  </header>
+
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3Zm-1.2 14.2-3.5-3.5 1.4-1.4 2.1 2.1 4.9-4.9 1.4 1.4-6.3 6.3Z"/></svg>
+    <span>Private: your message is checked on this device and never uploaded anywhere.</span>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-check" aria-selected="true" aria-controls="panel-check">Check a message</button>
+    <button class="tab" role="tab" id="tab-practice" aria-selected="false" aria-controls="panel-practice">Practice spotting scams</button>
+  </nav>
+
+  <!-- CHECK -->
+  <section id="panel-check" role="tabpanel" aria-labelledby="tab-check" class="wrap" style="gap:1.25rem">
+    <div class="sheet">
+      <label class="lead" for="msg">Paste the text, email, or link you got</label>
+      <textarea id="msg" spellcheck="false" placeholder="Paste the whole message here, including any links or phone numbers."></textarea>
+      <div class="examples" id="examples"><span>Try an example:</span></div>
+      <div class="row">
+        <button class="primary" id="checkBtn">Check this message</button>
+        <button class="secondary" id="clearBtn">Clear</button>
+      </div>
+      <p class="example-note" id="exampleNote" hidden>This is an example message so you can see how it works.</p>
+    </div>
+
+    <div id="results" class="wrap" style="gap:1.1rem" aria-live="polite"></div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section id="panel-practice" role="tabpanel" aria-labelledby="tab-practice" class="wrap" style="gap:1rem" hidden>
+    <div class="sheet">
+      <div class="practice-head">
+        <h2 style="font-size:1.3rem">Scam or real?</h2>
+        <span class="tally" id="tally">0 of 0 correct</span>
+      </div>
+      <p style="margin:0;color:var(--ink-soft)">Read each message the way you would on your phone. Decide, then see what Second Look found.</p>
+      <div class="from" id="pFrom"></div>
+      <div class="phone-msg" id="pMsg"></div>
+      <div class="row" id="pButtons">
+        <button class="primary" data-guess="scam">It's a scam</button>
+        <button class="secondary" data-guess="legit">Looks real</button>
+      </div>
+      <div id="pReveal" class="wrap" style="gap:.8rem" hidden></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>If you already paid or shared information: call your bank using the number on your card, then report it at ReportFraud.ftc.gov and IC3.gov.</span>
+    <span>Second Look gives a second opinion, not a guarantee. When in doubt, ask someone you trust.</span>
+  </footer>
+</div>
+
+<script src="engine.js"></script>
+<script>
+(function () {
+  'use strict';
+  const SL = window.SecondLook;
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+
+  // ---------------------------------------------------------------- examples
+  const EXAMPLES = [
+    { label: 'Toll text', text: 'The toll road notice: You have an unpaid toll balance of $6.99. To avoid a late fee of $50, pay within 24 hours at https://ezpass-billing.click/pay' },
+    { label: '"Grandma, it\'s me"', text: 'Grandma it\'s me, I was in a car accident and I\'m in jail. Please don\'t tell mom and dad. I need $3,000 for bail, the lawyer said you can pay with gift cards.' },
+    { label: 'PayPal alert', text: 'Dear Customer, we detected unusual activity on your PayPal account. Your account has been limited. Verify your account immediately at http://paypal.com.security-check.net/login or it will be closed.' },
+    { label: 'Fake Apple link', text: 'Security notice: sign in to verify your account at https://www.аpple.com/verify' },
+    { label: 'Renewal call', text: 'Norton Antivirus: your subscription has auto-renewed for $289.99. If you wish to cancel and get a refund, call our helpline at (855) 555-0111.' },
+    { label: 'Real bank code', text: 'Your Chase verification code is 482913. Don\'t share this code with anyone. We\'ll never call to ask for it.' }
+  ];
+  const exBox = $('#examples');
+  EXAMPLES.forEach((ex, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = ex.label; b.id = 'ex' + i;
+    b.addEventListener('click', () => { $('#msg').value = ex.text; $('#exampleNote').hidden = false; run(); });
+    exBox.appendChild(b);
+  });
+
+  // ---------------------------------------------------------------- render
+  const ICONS = {
+    high: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2 1 21h22L12 2Zm1 15h-2v-2h2v2Zm0-4h-2V9h2v4Z"/></svg>',
+    medium: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-2h2v2Zm0-4h-2V7h2v6Z"/></svg>',
+    low: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.5 14.5-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4-7 7Z"/></svg>'
+  };
+  const HEAD = {
+    high: ['Very likely a scam', 'Do not click, call, reply, or pay.'],
+    medium: ['Be careful', 'Some warning signs. Check with the company directly before doing anything.'],
+    low: ['No strong warning signs', 'This looks okay, but scammers change tactics. If anything feels off, ask someone.']
+  };
+
+  function markUp(text, highlights) {
+    let out = '', pos = 0;
+    for (const h of highlights) {
+      out += esc(text.slice(pos, h.start));
+      out += '<mark class="' + (h.sev === 'high' ? 'high' : '') + '">' + esc(text.slice(h.start, h.end)) + '</mark>';
+      pos = h.end;
+    }
+    return out + esc(text.slice(pos));
+  }
+
+  function verdictHTML(r) {
+    const [h, sub] = HEAD[r.level];
+    return '<div class="verdict ' + r.level + '">' + ICONS[r.level] +
+      '<h2>' + h + '</h2><p class="sub">' + (r.categoryName ? 'Looks like: <b>' + esc(r.categoryName) + '</b>. ' : '') + sub + '</p>' +
+      '<div class="meter" aria-label="Risk ' + r.score + ' out of 100"><div class="bar"><span class="pin" style="left:' + Math.max(2, Math.min(98, r.score)) + '%"></span></div>' +
+      '<div class="scale"><span>Looks okay</span><span>Be careful</span><span>Scam · ' + r.score + '/100</span></div></div></div>';
+  }
+
+  function reasonsHTML(r) {
+    if (!r.findings.length) return '<p style="margin:0;color:var(--ink-soft)">Second Look didn\'t find any of the common scam warning signs.</p>';
+    return '<ol class="reasons">' + r.findings.map(f =>
+      '<li class="' + (f.kind === 'safe' ? 'safe' : f.w >= 25 ? 'strong' : '') + '"><span class="dot" aria-hidden="true"></span>' +
+      '<strong>' + esc(f.title) + '</strong><p>' + esc(f.why) + '</p></li>').join('') + '</ol>';
+  }
+
+  function linksHTML(r) {
+    if (!r.links.length) return '';
+    return '<h3 class="sec">Links in this message</h3><div class="links">' + r.links.map(l => {
+      const tag = l.verdict === 'danger' ? '<span class="pill danger">Dangerous</span>' : l.verdict === 'caution' ? '<span class="pill caution">Suspicious</span>' : '<span class="pill ok">No problems found</span>';
+      return '<div class="link-card">' + tag + '<span class="url">' + esc(l.raw) + '</span>' +
+        '<span class="realsite">This link really goes to: <b>' + esc(l.realSite) + '</b>' +
+        (l.impersonates ? ' &mdash; not <b>' + esc(l.impersonates) + '</b>' : '') + '</span></div>';
+    }).join('') + '</div>';
+  }
+
+  let last = null;
+  function run() {
+    const text = $('#msg').value.trim();
+    const box = $('#results');
+    if (!text) { box.innerHTML = '<p style="color:var(--ink-soft);margin:0">Paste a message above, then choose <b>Check this message</b>.</p>'; last = null; return; }
+    const r = SL.analyze(text);
+    const adv = SL.advice(r);
+    last = { text, r };
+    box.innerHTML =
+      verdictHTML(r) +
+      '<div class="sheet"><h3 class="sec">What we found in the message</h3>' +
+        '<div class="marked">' + markUp(text, r.highlights) + '</div>' +
+        '<div class="legend"><span>Warning sign</span><span class="h">Strong warning sign</span></div></div>' +
+      '<div class="sheet"><h3 class="sec">Why</h3>' + reasonsHTML(r) + linksHTML(r) +
+        (r.phones.length && r.level !== 'low' ? '<h3 class="sec">Don\'t call these numbers</h3><div class="phones">' + r.phones.map(p => '<span>' + esc(p) + '</span>').join('') + '</div><p style="margin:0;font-size:.9rem;color:var(--ink-soft)">Use the number on the back of your card or on the company\'s official website instead.</p>' : '') +
+      '</div>' +
+      '<div class="sheet"><h3 class="sec">What to do now</h3><ol class="steps">' + adv.steps.map(s => '<li>' + esc(s) + '</li>').join('') + '</ol>' +
+        '<details' + (r.level === 'high' ? '' : '') + '><summary>Already paid, or shared a code or password?</summary><ul>' + adv.ifPaid.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul></details></div>' +
+      trustedHTML();
+    wireTrusted();
+  }
+
+  // ---------------------------------------------------------------- trusted person
+  function trustedHTML() {
+    return '<div class="sheet trusted"><h3 class="sec">Ask someone you trust</h3>' +
+      '<p style="margin:0;color:var(--ink-soft)">Scammers want you to act alone. A quick message to family or a friend is the best protection there is.</p>' +
+      '<div class="row"><div class="field"><label for="tName">Their name</label><input id="tName" autocomplete="off" placeholder="e.g. Priya"></div>' +
+      '<div class="field"><label for="tPhone">Their phone number (optional)</label><input id="tPhone" inputmode="tel" autocomplete="off" placeholder="e.g. 937-555-0100"></div></div>' +
+      '<div class="draft" id="draft"></div>' +
+      '<div class="row"><button class="primary" id="copyDraft">Copy message</button><button class="secondary" id="shareDraft">Send by text</button></div>' +
+      '<div class="toast" id="toast" role="status"></div></div>';
+  }
+  function draftText() {
+    if (!last) return '';
+    const name = ($('#tName') && $('#tName').value.trim()) || 'there';
+    const lvl = { high: 'says it is very likely a scam', medium: 'found some warning signs', low: 'didn\'t find strong warning signs' }[last.r.level];
+    const top = last.r.findings.filter(f => f.kind !== 'safe').slice(0, 3).map(f => '- ' + f.title).join('\n');
+    return 'Hi ' + name + ', I got this message and want a second opinion before I do anything. Second Look ' + lvl + (top ? ':\n' + top : '.') +
+      '\n\nHere is the message:\n"' + last.text + '"\n\nCan you call me when you get a chance?';
+  }
+  function wireTrusted() {
+    const n = $('#tName'), p = $('#tPhone');
+    n.value = store.get('sl.tName') || ''; p.value = store.get('sl.tPhone') || '';
+    const upd = () => { $('#draft').textContent = draftText(); store.set('sl.tName', n.value); store.set('sl.tPhone', p.value); };
+    n.addEventListener('input', upd); p.addEventListener('input', upd); upd();
+    $('#copyDraft').addEventListener('click', () => {
+      const t = draftText();
+      const done = () => { $('#toast').textContent = 'Copied. Paste it into a text or email.'; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, () => selectDraft());
+      else selectDraft();
+    });
+    $('#shareDraft').addEventListener('click', async () => {
+      const t = draftText();
+      if (navigator.share) { try { await navigator.share({ text: t }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+      const num = p.value.replace(/[^\d+]/g, '');
+      const href = 'sms:' + num + (/iPhone|iPad|Mac/.test(navigator.userAgent) ? '&' : '?') + 'body=' + encodeURIComponent(t);
+      const a = document.createElement('a'); a.href = href; a.rel = 'noopener'; a.click();
+      $('#toast').textContent = 'If your messages app didn\'t open, use "Copy message" instead.';
+    });
+  }
+  function selectDraft() {
+    const r = document.createRange(); r.selectNodeContents($('#draft'));
+    const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    $('#toast').textContent = 'Message selected. Press Copy on your keyboard or menu.';
+  }
+
+  // ---------------------------------------------------------------- controls
+  $('#checkBtn').addEventListener('click', () => { $('#exampleNote').hidden = true; run(); $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  $('#clearBtn').addEventListener('click', () => { $('#msg').value = ''; $('#exampleNote').hidden = true; run(); $('#msg').focus(); });
+
+  const big = $('#bigText');
+  function setBig(on) { document.documentElement.classList.toggle('big', on); big.setAttribute('aria-pressed', on); store.set('sl.big', on ? '1' : '0'); }
+  big.addEventListener('click', () => setBig(big.getAttribute('aria-pressed') !== 'true'));
+  setBig(store.get('sl.big') === '1');
+
+  const speak = $('#readAloud');
+  if (!('speechSynthesis' in window)) speak.hidden = true;
+  speak.addEventListener('click', () => {
+    if (!last) return;
+    speechSynthesis.cancel();
+    const [h, sub] = HEAD[last.r.level];
+    const reasons = last.r.findings.filter(f => f.kind !== 'safe').slice(0, 3).map(f => f.title + '. ' + f.why).join(' ');
+    const u = new SpeechSynthesisUtterance(h + '. ' + sub + ' ' + reasons);
+    u.rate = 0.9;
+    speechSynthesis.speak(u);
+  });
+
+  // ---------------------------------------------------------------- tabs
+  const tabs = [['#tab-check', '#panel-check'], ['#tab-practice', '#panel-practice']];
+  tabs.forEach(([t, p]) => $(t).addEventListener('click', () => {
+    tabs.forEach(([t2, p2]) => { $(t2).setAttribute('aria-selected', t2 === t); $(p2).hidden = t2 !== t; });
+  }));
+
+  // ---------------------------------------------------------------- practice
+  const PRACTICE = [
+    { from: 'Text from 1 (202) 555-0148', label: 'scam', text: 'USPS: Your package could not be delivered due to an incomplete address. Please update your details within 24 hours: https://usps-redelivery-help.top/track' },
+    { from: 'Text from 22000', label: 'legit', text: 'G-582034 is your Google verification code. Don\'t share this code with anyone.' },
+    { from: 'Text from unknown number', label: 'scam', text: 'Hi mum, this is my new number, I broke my phone. Can you help me pay a bill today? I\'ll pay you back tomorrow, I just need money urgently.' },
+    { from: 'Text from Dr. Patel\'s office', label: 'legit', text: 'Reminder: You have an appointment with Dr. Patel on Thursday, Nov 12 at 10:30 AM. Reply C to confirm or call the office to reschedule.' },
+    { from: 'Email from "Amazon Security"', label: 'scam', text: 'Amazon Security: an order of $1,249.99 for an iPhone was placed. If you did not authorize this purchase call us immediately at 1-888-555-0142 for a refund.' },
+    { from: 'Text from Wells Fargo', label: 'legit', text: 'Wells Fargo: A purchase of $42.17 at KROGER was made with your card ending 1234. If you don\'t recognize it, call the number on the back of your card.' },
+    { from: 'Text from unknown number', label: 'scam', text: 'Hi, is this Jessica? Sorry, wrong number! Anyway, you seem nice. I made a lot recently with a crypto trading platform my uncle uses, guaranteed returns of 30% weekly. Add me on WhatsApp.' },
+    { from: 'Email from "Microsoft 365"', label: 'scam', text: 'Microsoft 365: your mailbox storage is full. Log in here to restore your email: https://bit.ly/3xMs365' }
+  ];
+  let pi = 0, right = 0, done = 0;
+  function showCard() {
+    const c = PRACTICE[pi % PRACTICE.length];
+    $('#pFrom').textContent = c.from;
+    $('#pMsg').textContent = c.text;
+    $('#pReveal').hidden = true; $('#pButtons').hidden = false;
+    $('#tally').textContent = right + ' of ' + done + ' correct';
+  }
+  document.querySelectorAll('#pButtons button').forEach(b => b.addEventListener('click', () => {
+    const c = PRACTICE[pi % PRACTICE.length];
+    const ok = b.dataset.guess === c.label;
+    done++; if (ok) right++;
+    const r = SL.analyze(c.text);
+    $('#pMsg').innerHTML = markUp(c.text, r.highlights);
+    $('#pReveal').innerHTML =
+      '<div class="answer ' + (ok ? 'right' : 'wrong') + '">' + (ok ? 'Correct! ' : 'Not quite. ') + 'This one is ' + (c.label === 'scam' ? 'a scam.' : 'a real message.') + '</div>' +
+      verdictHTML(r) + reasonsHTML(r) +
+      '<div class="row"><button class="primary" id="pNext">Next message</button></div>';
+    $('#pReveal').hidden = false; $('#pButtons').hidden = true;
+    $('#tally').textContent = right + ' of ' + done + ' correct';
+    $('#pNext').addEventListener('click', () => { pi++; showCard(); });
+  }));
+  showCard();
+
+  // ---------------------------------------------------------------- start with a worked example
+  $('#msg').value = EXAMPLES[0].text;
+  $('#exampleNote').hidden = false;
+  run();
+
+  // Offline support when served from a real website (GitHub Pages)
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>
